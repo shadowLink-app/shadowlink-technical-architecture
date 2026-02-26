@@ -1,8 +1,8 @@
-# Shadow Link — Always-On-Top Browser Overlay for macOS
+# Shadow Link - Always-On-Top Browser Overlay for macOS
 
-**You need the web without leaving your flow.** This project is a unified solution: a floating, always-on-top browser overlay on your Mac—with shadow typing and screenshot OCR—backed by a landing site, Stripe checkout, and activation API so you can sell and unlock the desktop app (shadow-link / shadow-link-app) from a single backend (ShadowLink).
+**You need the web without leaving your flow.** This project is a unified solution: a floating, always-on-top browser overlay on your Mac with shadow typing and screenshot OCR, backed by a landing site, Stripe checkout, and activation API so you can sell and activate the desktop app (shadow-link / shadow-link-app) from a single backend (ShadowLink).
 
-> **One window, always on top.** Browse, type, and capture—without switching apps.
+> **One window, always on top.** Browse, type, and capture without switching apps.
 
 [Electron](https://www.electronjs.org/) · [Node.js](https://nodejs.org/) · [Express](https://expressjs.com/) · [MongoDB](https://www.mongodb.com/) · [Stripe](https://stripe.com/)
 
@@ -18,7 +18,7 @@
 
 ## 🎯 The problem (and what we built to address it)
 
-You need quick access to the web — references, docs, forms — without leaving your current app or breaking flow. Switching windows kills focus; opening a full browser is overkill, and your workflow gets scattered across tabs and apps. This project is a **unified solution**: a floating, always-on-top browser overlay on macOS that stays out of the way until you need it, with shadow typing and screenshot OCR built in—plus a landing site, Stripe checkout, and activation API so you can sell and unlock the desktop app from a single backend (ShadowLink).
+You need quick access to the web (references, docs, forms) without leaving your current app or breaking flow. Switching windows kills focus; opening a full browser is overkill, and your workflow gets scattered across tabs and apps. This project is a **unified solution**: a floating, always-on-top browser overlay on macOS that stays out of the way until you need it, with shadow typing and screenshot OCR built in, plus a landing site, Stripe checkout, and activation API so you can sell and activate the desktop app from a single backend (ShadowLink).
 
 ---
 
@@ -44,7 +44,7 @@ You need quick access to the web — references, docs, forms — without leaving
 | **2. Choose plan & checkout** | User goes to `/payment`, picks a plan, and completes Stripe Checkout. |
 | **3. Get activation code** | After payment, Stripe webhook fires → backend stores the activation in MongoDB and emails the code to the buyer (Nodemailer). |
 | **4. Enter code in app** | User installs the Shadow Link desktop app (shadow-link or shadow-link-app), opens it, and enters the activation code. |
-| **5. App validates** | Desktop app calls ShadowLink `/api/validate` (with `X-API-Secret`). Backend returns plan, expiry, and status; app unlocks features. |
+| **5. App validates** | Desktop app calls ShadowLink `/api/validate` (with `X-API-Secret`). Backend returns plan, expiry, and status; app activates features. |
 | **6. Use the overlay** | User can show/hide the overlay (`Cmd+Shift+M`), keep it on top (`Cmd+Shift+P`), use shadow typing (`F1`), take screenshots with OCR (`Cmd+Shift+S`), and browse in multiple tabs. |
 
 **In short:** Landing → Stripe → email code → enter in app → validate → use overlay.
@@ -52,7 +52,7 @@ You need quick access to the web — references, docs, forms — without leaving
 ---
 
 ## 🎨 Product & UI 
- <!-- **Media placeholders** — replace these with your own GIFs or screenshots for a polished launch page. -->
+ <!-- **Media placeholders**: replace these with your own GIFs or screenshots for a polished launch page. -->
 ### Hero / overview
 
 **[Insert GIF or screenshot: floating overlay in action over a fullscreen app]**
@@ -153,28 +153,28 @@ This repository is **one product** split into three folders:
 ```
 Project/
 ├── ShadowLink/          # Backend + web: landing, payments, activation API
-├── shadow-link/         # Desktop app (Electron) — primary build
+├── shadow-link/         # Desktop app (Electron), primary build
 └── shadow-link-app/     # Desktop app variant / alternate build
 ```
 
-### 1. **ShadowLink** — Backend & web
+### 1. **ShadowLink** - Backend & web
 
 - **Role:** Landing page, Stripe checkout, activation code generation, and API for the desktop app.
 - **Highlights:** EJS-rendered pages, Stripe webhooks, MongoDB for licenses, Nodemailer for activation emails, protected endpoints for the macOS app (`/api/validate`, `/api/status/:code`).
 - **Run:** `npm run dev` (or Docker); default landing at `http://localhost:3334`.
 
-### 2. **shadow-link** — Desktop app (Electron)
+### 2. **shadow-link** - Desktop app (Electron)
 
-- **Role:** The main macOS desktop app — floating overlay, shadow typing, screenshots, global shortcuts, multi-tab browser.
+- **Role:** The main macOS desktop app: floating overlay, shadow typing, screenshots, global shortcuts, multi-tab browser.
 - **Highlights:** Frameless always-on-top window, license validation against the backend, auto-update from GitHub releases.
 - **Run:** `npm start` (dev) or `npm run build:mac` (production).
 
-### 3. **shadow-link-app** — Desktop app variant
+### 3. **shadow-link-app** - Desktop app variant
 
 - **Role:** Same Electron product with possible config or build differences (e.g. update channel, targets).
 - **Use:** When you maintain two build variants; otherwise treat as the same app as `shadow-link`.
 
-**End-to-end flow:** Customer visits landing (ShadowLink) → pays via Stripe → receives activation code by email → enters code in desktop app (shadow-link / shadow-link-app) → app validates with ShadowLink API and unlocks features.
+**End-to-end flow:** Customer visits landing (ShadowLink) → pays via Stripe → receives activation code by email → enters code in desktop app (shadow-link / shadow-link-app) → app validates with ShadowLink API and activates features.
 
 ---
 
@@ -279,7 +279,7 @@ Required for **shadow typing** (global keyboard input so you can type into the o
 
 ## 📄 License
 
-MIT — see the LICENSE file in the repo for details.
+MIT - see the LICENSE file in the repo for details.
 
 ---
 
