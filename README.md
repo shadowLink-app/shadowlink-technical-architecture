@@ -31,6 +31,7 @@ You need quick access to the web (references, docs, forms) without leaving your 
 | **Screenshots & OCR** | Capture the screen and extract text with one shortcut. |
 | **Global shortcuts** | Show/hide, pin, and control the overlay from anywhere. |
 | **Multi-tab** | Browse multiple sites in one floating window. |
+| **Draggable window** | Custom frameless window with drag support. |
 | **Licensing & payments** | Stripe checkout, activation codes, and email delivery. |
 | **Auto-updates** | Desktop app updates from GitHub releases. |
 
@@ -51,11 +52,15 @@ You need quick access to the web (references, docs, forms) without leaving your 
 
 ---
 
-## 🎨 Product & UI 
- <!-- **Media placeholders**: replace these with your own GIFs or screenshots for a polished launch page. -->
+## 🎨 Product & UI
+
+<!-- **For whoever adds media:** Put your files in `docs/screenshots/` with the names below. The README will display them automatically. -->
+
 ### Hero / overview
 
-**[Insert GIF or screenshot: floating overlay in action over a fullscreen app]**
+**[Insert:** GIF or screenshot of the floating overlay in action over a fullscreen app. Example: `docs/screenshots/01-hero-overlay.gif` **]**
+
+![Floating overlay in action over a fullscreen app](docs/screenshots/01-hero-overlay.gif)
 
 *Suggested: 5–10 second loop of the overlay appearing over another app, then typing or taking a screenshot.*
 
@@ -63,7 +68,9 @@ You need quick access to the web (references, docs, forms) without leaving your 
 
 ### Desktop app experience
 
-**[Insert screenshot: Shadow Link window with tabs and clean UI]**
+**[Insert:** Screenshot of the Shadow Link window with tabs and clean UI. Example: `docs/screenshots/02-desktop-app.png` **]**
+
+![Shadow Link window with tabs and clean UI](docs/screenshots/02-desktop-app.png)
 
 *Suggested: Main window with 2–3 tabs, draggable frameless design visible.*
 
@@ -71,7 +78,9 @@ You need quick access to the web (references, docs, forms) without leaving your 
 
 ### Shadow typing in use
 
-**[Insert GIF: user in another app, overlay visible, typing into overlay]**
+**[Insert:** GIF of shadow typing: user in another app, overlay visible, typing into the overlay. Example: `docs/screenshots/03-shadow-typing.gif` **]**
+
+![Shadow typing: overlay visible while typing in another app](docs/screenshots/03-shadow-typing.gif)
 
 *Suggested: Focus on the overlay receiving keystrokes while another app is in the foreground.*
 
@@ -79,7 +88,9 @@ You need quick access to the web (references, docs, forms) without leaving your 
 
 ### Checkout & activation flow
 
-**[Insert screenshot: payment page or success screen with activation code]**
+**[Insert:** Screenshot of payment page or success screen with activation code. Example: `docs/screenshots/04-checkout-activation.png` **]**
+
+![Payment page or success screen with activation code](docs/screenshots/04-checkout-activation.png)
 
 *Suggested: Stripe checkout or “Code sent to your email” confirmation.*
 
@@ -176,9 +187,38 @@ Project/
 
 **End-to-end flow:** Customer visits landing (ShadowLink) → pays via Stripe → receives activation code by email → enters code in desktop app (shadow-link / shadow-link-app) → app validates with ShadowLink API and activates features.
 
+### Backend API (ShadowLink) at a glance
+
+| Type | Method | Route | Description |
+|------|--------|-------|-------------|
+| Public | POST | `/api/checkout-session` | Creates a Stripe Checkout session |
+| Public | GET | `/api/transactions` | Latest recorded Stripe checkouts |
+| Public | GET | `/api/health` | Health check |
+| Webhook | POST | `/webhook/stripe` | Stripe webhook; mints/sends activation codes |
+| App API | POST | `/api/validate` | Validates activation code (requires `X-API-Secret`) |
+| App API | GET | `/api/status/:code` | Activation code details (requires `X-API-Secret`) |
+| Legacy | POST | `/api/activations/verify` | Validates activation code (no auth; backward compatible) |
+
+Full request/response details: see `ShadowLink/README.md`.
+
+### Desktop app folder structure (shadow-link / shadow-link-app)
+
+```
+shadow-link/
+├── src/
+│   ├── main/           # Electron main process (index.js, window-manager, shadow-typing, etc.)
+│   ├── renderer/       # Browser UI (index.html, styles, scripts)
+│   └── shared/         # Shared utilities
+├── build/              # Icons, entitlements
+├── scripts/            # Build scripts
+└── package.json
+```
+
 ---
 
 ## 🚀 Installation & quick start
+
+Clone the repository (or ensure you are at the repo root). All paths below are relative to the repo root.
 
 ### Prerequisites
 
@@ -214,6 +254,12 @@ Project/
 docker compose up --build
 ```
 
+**Docker (hot reload / development):**
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
+Uses nodemon so code changes trigger an automatic server restart.
+
 ---
 
 ### Desktop app (shadow-link or shadow-link-app)
@@ -233,6 +279,39 @@ docker compose up --build
    npm run build:mac
    ```
    Output: `dist/mac-universal/Shadow Link.app`
+
+4. **Publish (build and push to GitHub releases):**
+   ```bash
+   npm run publish
+   ```
+   For more on code signing and notarization, see `shadow-link/docs/MACOS.md` or the desktop app README.
+
+### Manual Notarization
+
+From the desktop app folder (`shadow-link` or `shadow-link-app`), after building:
+
+```bash
+# 1. Build the app
+npm run build:mac
+
+# 2. Sign the app
+codesign --force --deep --sign "Developer ID Application: Your Name (TEAMID)" \
+  --options runtime \
+  --entitlements build/entitlements.mac.plist \
+  "dist/mac-universal/Shadow Link.app"
+
+# 3. Create DMG and submit for notarization
+xcrun notarytool submit "dist/Shadow Link-2.0.0-universal.dmg" \
+  --apple-id "your@email.com" \
+  --password "xxxx-xxxx-xxxx-xxxx" \
+  --team-id "XXXXXXXXXX" \
+  --wait
+
+# 4. Staple the ticket
+xcrun stapler staple "dist/Shadow Link-2.0.0-universal.dmg"
+```
+
+Replace placeholders (Your Name, TEAMID, email, app-specific password, team-id) with your Apple Developer values. Version in the DMG filename may vary.
 
 ---
 
@@ -271,9 +350,10 @@ Required for **shadow typing** (global keyboard input so you can type into the o
 
 | Resource | Location |
 |----------|----------|
-| Backend API (validate, status, checkout, webhooks) | `ShadowLink/README.md` |
+| Backend API (full endpoints, curl examples, response format) | `ShadowLink/README.md` |
 | Desktop app architecture | `shadow-link/docs/ARCHITECTURE.md` or `shadow-link-app/docs/ARCHITECTURE.md` |
 | Electron & build details | `shadow-link/docs/ELECTRON.md`, `shadow-link-app/docs/ELECTRON.md` |
+| macOS integration (signing, notarization, permissions) | `shadow-link/docs/MACOS.md` or `shadow-link-app/docs/MACOS.md` |
 
 ---
 
